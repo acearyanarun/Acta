@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output
+.next/
+dist/
+build/
+*.tsbuildinfo
+
+# Env (never commit real secrets)
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Test / coverage
+coverage/
+.vitest/
+
+# Docker volumes (local dev only)
+.docker-data/
+
+# Misc
+*.pid

@@ -1,0 +1,220 @@
+/*
+ * Acta tokens.css
+ *
+ * Single source of truth for every CSS custom property in the app.
+ * Import order: tokens → atoms → surfaces. This file owns NO selectors
+ * other than :root, @media print, @media (prefers-reduced-motion: reduce),
+ * @font-face, and ::selection. Anything that needs a class selector
+ * lives in atoms.css or surfaces.css.
+ *
+ * Locked conventions:
+ *  - Phase 0 §3.3 corner ticks: hairline 1px border ON the panel; 8x8
+ *    L-brackets drawn INSIDE the border at inset:4px. The 4px inset
+ *    counts against panel interior padding budget. Cards/panels in
+ *    atoms.css size their padding accordingly (effective top/bottom
+ *    interior = --space-4 + 4px).
+ *  - Phase 0 + delta: --type-xs is for STATIC chrome only (eyebrows,
+ *    table headers, footer captions). Interactive controls (buttons,
+ *    chip CTAs, pill toggles) floor at --type-sm (12px).
+ *  - All contrast ratios verified against WCAG. See Deliverable 1 §1.4.
+ *  - Phase 0 revision (palette swap): brutalist developer-tool dark
+ *    replaced with "warm vellum" scholarly-modern. Atoms, surfaces,
+ *    motion, file split, a11y floor — all unchanged. Only the
+ *    --* color values in this file moved. The change positions Acta
+ *    against the academic/archival tradition rather than the
+ *    developer-tool category.
+ *  - Glow tokens split: --signal-glow is the focus-ring halo,
+ *    --signal-shadow is the elevation drop-shadow. On cream both
+ *    read as soft shadows rather than the bright halos that worked
+ *    on near-black.
+ *
+ *  - WARN USAGE RULE (locked, do not relitigate in surfaces):
+ *      --warn = #7A4310 is used ONLY as stroke / border-left / icon
+ *      tint / chip border. NEVER as body text. The chosen value sits
+ *      at 6.95:1 against --bg-base — solid AA but just shy of the
+ *      AAA floor the spec demands for signal-color labels. To keep
+ *      AAA on every label, banner --drift and --refusal carry their
+ *      warn signal via the left stripe + icon glyph; banner BODY
+ *      text is always --text-primary. Track B/C surfaces must honor
+ *      this. See atoms.css Banner section for the implementation.
+ *
+ *  - NOTE (future grain rule, Phase 5+): when paper-grain texture
+ *      is added, do NOT use mix-blend-mode: overlay — on cream that
+ *      blend amplifies the texture into visible artifacts. Use
+ *      mix-blend-mode: multiply at 3–5% opacity instead; the texture
+ *      darkens into the paper like ink stippling. Cream backgrounds
+ *      do not behave like dark backgrounds under overlay blending.
+ *
+ *  - NOTE (Phase 4 QA, role-stripe colorblind concern, NOT NOW):
+ *      --signal (forest green) and --quiet (ink blue) at 2px stripe
+ *      width sit in a range that compresses for deutan/protan vision.
+ *      Colors stay as-is — the role-eyebrow text (// INSTRUCTOR vs
+ *      // STUDENT) is the primary textual cue. Phase 4 QA should
+ *      evaluate adding a non-color pattern cue (solid stripe for
+ *      instructor, dashed for student, etc.) and file a ticket if so.
+ *      Implementation deferred; flag here so reviewers don't miss it.
+ */
+
+:root {
+  /* ---- Color — "warm vellum" scholarly-modern palette ---- */
+  --bg-base: #f4efe6; /* warm vellum — slightly off-white, paper-feeling */
+  --bg-elevated: #fbf8f2; /* one step lighter for cards/panels */
+  --bg-overlay: rgba(244, 239, 230, 0.92);
+
+  --text-primary: #1a1814; /* deep warm ink (not pure black) */
+  --text-muted: #6b6359; /* warm gray-brown */
+  --text-inverse: #fbf8f2; /* used on accent fills */
+
+  --signal: #155734; /* deep forest — 7.50:1 AAA verified */
+  --signal-dim: rgba(21, 87, 52, 0.7);
+  --signal-glow: rgba(21, 87, 52, 0.18); /* focus-ring outer halo */
+  --signal-shadow: rgba(21, 87, 52, 0.1); /* elevation soft drop-shadow */
+
+  --quiet: #1e4d8c; /* deep ink blue — 7.35:1 AAA verified */
+  --quiet-dim: rgba(30, 77, 140, 0.5);
+
+  --warn: #7a4310; /* deeper burnt umber — STROKE ONLY per usage rule above */
+  --warn-bg: rgba(122, 67, 16, 0.08);
+  --error: #8a1f22; /* deeper bordeaux — 7.97:1 AAA verified */
+  --error-bg: rgba(138, 31, 34, 0.08);
+
+  --border: rgba(26, 24, 20, 0.15);
+  --border-strong: rgba(26, 24, 20, 0.35);
+  --border-muted: rgba(26, 24, 20, 0.1);
+  --divider: rgba(26, 24, 20, 0.08);
+
+  --role-instructor: var(--signal); /* forest green stripe */
+  --role-student: var(--quiet); /* ink blue stripe */
+
+  /* ---- Type ---- */
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Static-chrome sizes (eyebrows, table headers, footer captions). */
+  --type-xs: 11px;
+  /* Interactive-control floor (buttons, chip CTAs, pill toggles). */
+  --type-sm: 12px;
+  --type-base: 13px;
+  --type-md: 14px;
+  --type-lg: 16px;
+  --type-xl: 20px;
+  --type-2xl: 28px;
+  /* Sans, home hero only. */
+  --type-hero: 48px;
+
+  /* Line-heights (paired by name). */
+  --lh-xs: 1.4;
+  --lh-sm: 1.55;
+  --lh-base: 1.55;
+  --lh-md: 1.5;
+  --lh-lg: 1.4;
+  --lh-xl: 1.3;
+  --lh-2xl: 1.2;
+  --lh-hero: 1.1;
+
+  /* Letter-spacing scale (widens for smaller text — brutalist signature). */
+  --track-xs: 0.16em;
+  --track-sm: 0.08em;
+  --track-base: 0.04em;
+  --track-md: 0.04em;
+  --track-lg: 0.04em;
+  --track-xl: 0.02em;
+  --track-2xl: 0;
+  --track-hero: -0.01em;
+
+  /* Eyebrow track widens further to underline its decorative role. */
+  --track-eyebrow: 0.18em;
+
+  --weight-body: 400;
+  --weight-heading: 500;
+  --weight-strong: 700;
+
+  /* ---- Spacing (4px base) ---- */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+
+  /* ---- Radius (deliberately small) ---- */
+  --radius-0: 0;
+  --radius-1: 2px;
+  --radius-2: 3px;
+  --radius-round: 999px;
+
+  /* ---- Border weights (only two — hairline + strong) ---- */
+  --border-width-hairline: 1px;
+  --border-width-strong: 2px;
+
+  /* ---- Corner-tick geometry (per S3 lock — DO NOT relitigate in atoms.css) ---- */
+  --tick-size: 8px;
+  --tick-inset: 4px;
+  --tick-color: var(--border);
+
+  /* ---- Motion ---- */
+  --ease-out-snap: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --ease-linear: linear;
+
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 400ms;
+
+  /* ---- Z-index scale ---- */
+  --z-base: 0;
+  --z-sticky: 10;
+  --z-overlay: 20;
+  --z-modal: 30;
+  --z-toast: 40;
+
+  color-scheme: light;
+}
+
+/* ---------- Print mode (passive — every screen surface auto-flattens) ---------- */
+@media print {
+  :root {
+    --bg-base: #ffffff;
+    --bg-elevated: #ffffff;
+    --bg-overlay: #ffffff;
+    --text-primary: #000000;
+    --text-muted: #444444;
+    --text-inverse: #000000;
+    --signal: #000000;
+    --signal-dim: transparent;
+    --signal-glow: transparent;
+    --signal-shadow: transparent;
+    --quiet: #000000;
+    --quiet-dim: transparent;
+    --warn: #663300;
+    --warn-bg: transparent;
+    --error: #aa0000;
+    --error-bg: transparent;
+    --border: #000000;
+    --border-strong: #000000;
+    --border-muted: #888888;
+    --divider: #cccccc;
+    --tick-color: #000000;
+    color-scheme: light;
+  }
+}
+
+/* ---------- Reduced motion (collapses every animation in §4.3) ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Text selection ---------- */
+::selection {
+  background: var(--signal-dim);
+  color: var(--text-inverse);
+}

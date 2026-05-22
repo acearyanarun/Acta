@@ -1,0 +1,9 @@
+{
+  "name": "@acta/ai",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "echo 'no TS in ai workspace yet'"
+  }
+}

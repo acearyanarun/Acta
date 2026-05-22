@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "acta-frontend",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@acta/frontend", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "acta-backend",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["--filter", "@acta/backend", "dev"],
+      "port": 4000
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+{
+  "name": "acta",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Acta — verification layer for AI-era learning (foundation scaffolding)",
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=20.10.0"
+  },
+  "scripts": {
+    "dev:frontend": "pnpm --filter @acta/frontend dev",
+    "dev:backend": "pnpm --filter @acta/backend dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "test": "vitest run",
+    "test:foundation": "vitest run tests/foundation.test.ts",
+    "db:up": "docker compose up -d postgres",
+    "db:down": "docker compose down",
+    "check:foundation": "bash scripts/check-foundation.sh"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "typescript": "5.6.3",
+    "vitest": "2.1.4"
+  }
+}

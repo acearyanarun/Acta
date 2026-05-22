@@ -1,0 +1,29 @@
+# =============================================================================
+# LOCAL DEVELOPMENT ONLY — Acta foundation
+# =============================================================================
+# This file provisions a local Postgres for development of the foundation
+# scaffolding. It is NOT a deployment configuration and makes NO production
+# assumptions. Production database provider remains a DEFERRED L3 decision
+# (see docs/decisions.md). Do not copy this file into any deployment pipeline.
+# =============================================================================
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: acta-postgres-dev
+    environment:
+      POSTGRES_USER: acta
+      POSTGRES_PASSWORD: acta
+      POSTGRES_DB: acta_dev
+    ports:
+      - "5432:5432"
+    volumes:
+      - acta-postgres-dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U acta -d acta_dev"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  acta-postgres-dev:

@@ -1,0 +1,9 @@
+/*
+ * Acta global stylesheet — Phase 1 step 9 shell.
+ * Cascade order is fixed: tokens (custom properties) -> atoms
+ * (reset + atomic primitives) -> surfaces (page-specific rules).
+ * Do not add rules to this file. Add them to the appropriate sibling.
+ */
+@import "./tokens.css";
+@import "./atoms.css";
+@import "./surfaces.css";

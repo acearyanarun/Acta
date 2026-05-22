@@ -1,0 +1,2439 @@
+/*
+ * Acta surfaces.css
+ *
+ * Page- and feature-specific styles. Imports are handled by globals.css.
+ * Cascade order: tokens.css -> atoms.css -> surfaces.css. Rules here
+ * are allowed to override atom defaults at equal specificity because
+ * they ship later in the cascade.
+ *
+ * Contains:
+ *   - Legacy token aliases (--bg, --surface, --text, --muted, --accent)
+ *     so existing rules continue to resolve until each is migrated to
+ *     new token names. The :root block below RETIRES in a follow-up
+ *     migration sprint once every reference is rewritten.
+ *   - .app-shell, .app-footer, top-nav surface tweaks, home, dashboard,
+ *     stepper surface, evidence report, brain-assistant, voice-capture,
+ *     TA Lab, and every other surface that wasn't an atom.
+ */
+
+/*
+ * Legacy token aliases — every existing surface rule below in this
+ * file references --bg / --surface / --text / --muted / --accent and
+ * will continue to work via these aliases until step 9 migrates them
+ * to the new names. Tokens.css owns --border directly; rules in this
+ * file referencing var(--border) now resolve to the new neon hairline.
+ */
+:root {
+  --bg: var(--bg-base);
+  --surface: var(--bg-elevated);
+  --text: var(--text-primary);
+  --muted: var(--text-muted);
+  --accent: var(--signal);
+}
+
+/* Reset + body baseline now owned by atoms.css. */
+
+.app-shell {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+/* Top-nav chrome lives entirely in atoms.css. No .top-nav__* rules in surfaces. */
+
+.back-link {
+  display: inline-block;
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  margin-bottom: 12px;
+}
+.back-link:hover {
+  color: var(--accent);
+}
+
+.submission-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.submission-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.submission-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.submission-row__snippet {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.concept-check__controls {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.concept-check__count {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+.concept-check__count input {
+  width: 64px;
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+}
+.concept-check__sets {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.concept-check__set-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+.concept-check__questions {
+  list-style: decimal inside;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.concept-check__question-prompt {
+  display: inline;
+}
+.concept-check__question-tag {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  color: var(--text);
+}
+
+a {
+  color: var(--accent);
+}
+
+.placeholder-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 16px;
+}
+
+.placeholder-tag {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 8px;
+  margin-right: 8px;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.btn {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+}
+.btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+.btn--primary:disabled {
+  background: #94a3b8;
+  border-color: #94a3b8;
+  cursor: not-allowed;
+}
+.btn--ghost {
+  background: transparent;
+}
+
+.assignment-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+.assignment-card {
+  display: block;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+.assignment-card .eyebrow {
+  /* Card-internal eyebrow sits tight to the title below it. */
+  margin: 0 0 var(--space-1);
+}
+.assignment-card__title {
+  font-weight: var(--weight-strong);
+  font-size: var(--type-lg);
+  margin: var(--space-1) 0 var(--space-3);
+}
+
+/* ========== /student empty-state ========== */
+/* Replaces the prior inline-styled <p><strong>...</strong></p> pattern with
+ * semantic classes so the empty card matches the spec's eyebrow/headline/body
+ * structure. Track A §1.6. */
+.empty-state__headline {
+  margin: 0 0 var(--space-3);
+  font-size: var(--type-lg);
+  font-weight: var(--weight-strong);
+  color: var(--text-primary);
+}
+.empty-state__body {
+  margin: 0 0 var(--space-4);
+  color: var(--text-muted);
+  font-size: var(--type-md);
+  line-height: var(--lh-md);
+  max-width: 56ch;
+}
+.empty-state__action {
+  margin: 0;
+}
+
+/* ========== /submissions/[id] role toggle ========== */
+/* Pair of pills, one active per current ?role= param. Spec §3.1 +
+ * TSS2 resolution: at <768px stays as stacked pills (Select wrapper
+ * deferred to Track B). */
+.role-toggle-group {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin: 0 0 var(--space-5);
+}
+
+/* ========== /submissions/[id] submission body ========== */
+/* Submission content rendered as a styled <pre> inside a role-stripe
+ * card. The eyebrow above ("YOUR SUBMISSION" or "STUDENT SUBMISSION")
+ * communicates whose work the user is looking at. */
+.submission-body {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--type-base);
+  line-height: var(--lh-base);
+  color: var(--text-primary);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ========== /student/[id] policy hash row ========== */
+/* Sits beneath the page H1 on /student/[id]. Eyebrow label inline with the
+ * HashChip. Track A spec §2.1: "policy v1 · #7964f79". */
+.hash-chip-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin: 0 0 var(--space-5);
+}
+.hash-chip-row .eyebrow {
+  /* Inline-aligned with the chip, not stacked above it. */
+  margin: 0;
+}
+
+/* ========== Mobile: /student assignment card (Track A §5.1) ========== */
+/* At <768px the OPEN affordance stacks below the meta pills instead of
+ * sitting right-aligned beside them. The meta row is already flex-wrap:wrap;
+ * we just claim a full flex-basis for the open-cue so it lands on its own
+ * line, and zero out the margin-left:auto that pinned it to the right.
+ * Title row, role stripe, corner ticks, pills, hash chip all unchanged.
+ * Pattern: target the *named* affordance, not the whole meta row, so
+ * future routes can opt into the same stack behavior without breaking
+ * card composition. */
+@media (max-width: 767px) {
+  .assignment-card__open-cue {
+    margin-left: 0;
+    margin-top: var(--space-2);
+    flex-basis: 100%;
+  }
+}
+.assignment-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  font-size: var(--type-sm);
+}
+.assignment-card__open-cue {
+  margin-left: auto;
+  font-size: var(--type-xs);
+  letter-spacing: var(--track-eyebrow);
+  color: var(--signal);
+  text-transform: uppercase;
+}
+.card--interactive:hover .assignment-card__open-cue {
+  color: var(--text-primary);
+}
+
+.assignment-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+.field > span {
+  font-weight: 500;
+  font-size: 13px;
+}
+.field input[type="text"],
+.field textarea {
+  font: inherit;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  resize: vertical;
+}
+
+.mode-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+.mode-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  background: var(--surface);
+}
+.mode-card--selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(30, 58, 138, 0.12);
+}
+.mode-card__radio {
+  margin-right: 8px;
+}
+.mode-card__label {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.mode-card__subtitle {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.ai-help-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ai-help-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 0;
+}
+.ai-help-row--hard {
+  border-top: 1px dashed var(--border);
+  padding-top: 14px;
+  margin-top: 6px;
+}
+.ai-help-row__label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+}
+.ai-help-row__pill {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #fef3c7;
+  color: #92400e;
+  font-weight: 600;
+}
+.ai-help-row__helper {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 2px;
+}
+
+.version-badge {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: #e2e8f0;
+  color: var(--muted);
+  font-weight: 600;
+}
+.version-badge--current {
+  background: var(--accent);
+  color: white;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+.form-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+.form-error {
+  color: #b91c1c;
+  background: #fee2e2;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.historical-banner {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.prewrap {
+  white-space: pre-wrap;
+  font: inherit;
+  margin: 0;
+}
+
+.kv {
+  display: grid;
+  gap: 8px;
+}
+.kv > div {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 12px;
+  font-size: 13px;
+  align-items: baseline;
+}
+.kv code {
+  font-size: 12px;
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  word-break: break-all;
+}
+
+.version-history {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.policy-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.policy-list__item--hard {
+  border-left: 3px solid var(--accent);
+  padding-left: 10px;
+}
+.policy-list__row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.policy-banner {
+  background: #f1f5f9;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 13px;
+}
+.policy-banner__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.policy-banner__row--muted {
+  color: var(--muted);
+}
+.policy-banner__row--hard {
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border);
+}
+
+.chip-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+.chip {
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+.chip--selected {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+.chip--disabled {
+  background: #f1f5f9;
+  color: #94a3b8;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.help-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.help-chat__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+}
+.help-chat__header-body {
+  flex: 1;
+  min-width: 0;
+}
+.help-chat__title {
+  font-weight: 600;
+  font-size: 14px;
+}
+.help-chat__subtitle {
+  margin: 2px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+.help-chat__speak-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.help-chat__speak-toggle input {
+  margin: 0;
+}
+.chat-thread {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 80px;
+}
+.chat-bubble {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  background: var(--surface);
+}
+.chat-bubble--student {
+  align-self: flex-end;
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  max-width: 80%;
+}
+.chat-bubble--assistant {
+  align-self: flex-start;
+  max-width: 80%;
+}
+.chat-bubble--refused {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+.chat-bubble--redirected {
+  border-color: #f59e0b;
+  background: #fffbeb;
+}
+.chat-bubble__role {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.chat-bubble__content {
+  white-space: pre-wrap;
+}
+.chat-bubble__reason {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #92400e;
+}
+.chat-bubble__provenance {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.chat-input {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  margin-top: 8px;
+}
+.chat-input__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+}
+.voice-chat-input {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.voice-chat-input__consent {
+  color: var(--muted);
+  font-size: 11px;
+}
+.chat-input textarea {
+  flex: 1;
+  font: inherit;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  resize: vertical;
+}
+
+.concept-check__divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 16px 0;
+}
+.concept-check__attempts-heading {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 12px 0 8px;
+}
+
+.verification-card__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.verification-card {
+  background: var(--surface);
+}
+.verification-card__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+.verification-card__overall {
+  margin: 4px 0 12px;
+}
+.verification-card__feedback-list {
+  list-style: decimal inside;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.verification-card__question-prompt {
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+.verification-card__answer {
+  background: #f8fafc;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 4px 0 6px;
+}
+.verification-card__answer-label {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.verification-card__feedback {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 13px;
+}
+.verification-card__feedback--missing {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.verification-badge {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 4px;
+  color: white;
+}
+.verification-badge--pass {
+  background: #16a34a;
+}
+.verification-badge--needs_review {
+  background: #f59e0b;
+}
+.verification-badge--fail {
+  background: #dc2626;
+}
+
+.verification-status {
+  display: inline-block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  min-width: 90px;
+  text-align: center;
+}
+.verification-status--sufficient {
+  background: #dcfce7;
+  color: #14532d;
+}
+.verification-status--partial {
+  background: #fef3c7;
+  color: #92400e;
+}
+.verification-status--insufficient {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.verification-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.verification-form__questions {
+  list-style: decimal inside;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.verification-form__prompt {
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+.verification-form__tag {
+  font-size: 11px;
+  color: var(--muted);
+  margin-left: 6px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.reference-solution-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.reference-solution-display {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.reference-solution__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+.reference-solution-display h3 {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 4px 0 6px;
+}
+.reference-solution__list {
+  list-style: decimal inside;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+}
+.reference-solution__history {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+.reference-solution__history-link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+/* --- demo-flow polish additions --- */
+
+.workspace-badge {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  margin-bottom: 8px;
+  background: #e2e8f0;
+  color: var(--text);
+}
+.workspace-badge--instructor {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+.workspace-badge--student {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.page-sub {
+  color: var(--muted);
+  margin: 6px 0 12px;
+  max-width: 640px;
+  font-size: 14px;
+}
+
+.section-helper {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0 0 10px;
+}
+
+/* (legacy .top-nav__brand/sub/link rules removed — atoms.css owns top-nav chrome) */
+
+.home__headline {
+  font-size: 28px;
+  line-height: 1.25;
+  margin: 6px 0 12px;
+  max-width: 720px;
+}
+.home__sub {
+  color: var(--muted);
+  max-width: 720px;
+  margin-bottom: 20px;
+}
+.demo-strip {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 13px;
+}
+.demo-strip li {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 6px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted);
+}
+.demo-strip li span {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  line-height: 18px;
+}
+.home__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.home__card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-decoration: none;
+  color: var(--text);
+}
+.home__card h2 {
+  font-size: 18px;
+  margin: 4px 0 0;
+}
+.home__card p {
+  color: var(--muted);
+  margin: 0;
+  font-size: 14px;
+}
+.home__cta {
+  margin-top: 8px;
+  font-weight: 600;
+  color: var(--accent);
+  font-size: 13px;
+}
+
+/* ------- Sprint A: home hero CTA row ------- */
+.home {
+  max-width: 760px;
+}
+.home__headline {
+  font-size: 36px;
+  line-height: 1.15;
+  margin: 16px 0 14px;
+  font-weight: 700;
+}
+.home__sub {
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0 0 24px;
+}
+.home__cta-row {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin: 0 0 32px;
+  flex-wrap: wrap;
+}
+.btn--lg {
+  font-size: 15px;
+  padding: 12px 20px;
+}
+.home__cta-secondary {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+}
+.home__cta-secondary:hover {
+  color: var(--accent);
+}
+
+/* ------- Sprint A: dashboard summary grouping ------- */
+.dashboard-group {
+  margin: 18px 0;
+}
+.dashboard-group__label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+/* ------- Sprint B: hero-card modifier (used on the verification-mode block) ------- */
+.placeholder-card--hero {
+  border-width: 2px;
+  border-color: var(--accent);
+  background: var(--accent-soft, rgba(33, 102, 235, 0.04));
+}
+.placeholder-card--hero h2 {
+  font-size: 1.15rem;
+}
+
+/* ------- Sprint B: nudge banner (Solution Guide auto-prompt) ------- */
+.nudge-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 16px;
+  margin: 12px 0;
+  background: rgba(217, 119, 6, 0.06);
+  border: 1px solid rgba(217, 119, 6, 0.3);
+  border-radius: 10px;
+}
+.nudge-banner strong {
+  display: block;
+}
+.nudge-banner__sub {
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 2px;
+  display: block;
+}
+
+/* ------- Sprint B: larger verification badge + counts row ------- */
+.verification-badge--lg {
+  font-size: 1.05rem;
+  padding: 6px 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+.verification-card__counts {
+  font-weight: 500;
+  color: var(--text);
+}
+
+/* ------- Sprint B: dashboard pill visual differentiation ------- */
+/* Outcome pills (pass / needs_review / fail) keep their colored fill but get a
+   small leading dot for scannability. Non-outcome pills (neutral / info) become
+   subtler — lighter background, dot prefix, lighter weight — so they no longer
+   compete with outcomes. */
+.dashboard-pill.verification-status--sufficient::before,
+.dashboard-pill.verification-status--partial::before,
+.dashboard-pill.verification-status--insufficient::before {
+  content: "●";
+  margin-right: 6px;
+  font-size: 9px;
+  vertical-align: middle;
+}
+.dashboard-pill--neutral,
+.dashboard-pill--info {
+  background: transparent;
+  font-weight: 400;
+  color: var(--muted);
+  border: 1px dashed var(--border);
+}
+.dashboard-pill--neutral::before,
+.dashboard-pill--info::before {
+  content: "○";
+  margin-right: 6px;
+  font-size: 9px;
+  vertical-align: middle;
+}
+
+/* ------- Sprint C: app footer ------- */
+.app-footer {
+  border-top: 1px solid var(--border);
+  padding: 16px 24px;
+  margin-top: 48px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--muted);
+}
+.app-footer a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.app-footer a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* ------- Sprint C: breadcrumb (evidence report) ------- */
+.breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.breadcrumb a {
+  color: var(--muted);
+  text-decoration: none;
+}
+.breadcrumb a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.breadcrumb span[aria-current="page"] {
+  color: var(--text);
+  font-weight: 500;
+}
+
+/* ------- Sprint C: role toggle on submission viewer ------- */
+.role-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 6px;
+}
+.role-toggle__pill {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.role-toggle__pill--instructor {
+  background: rgba(33, 102, 235, 0.1);
+  color: var(--accent);
+}
+.role-toggle__pill--student {
+  background: rgba(34, 197, 94, 0.1);
+  color: #166534;
+}
+.role-toggle__switch {
+  font-size: 12px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.role-toggle__switch:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+@media print {
+  .app-footer,
+  .breadcrumb,
+  .role-toggle {
+    display: none !important;
+  }
+}
+
+/* ------- D-048: BrainAssistant neural-glow visual ------- */
+.brain-assistant {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: none;
+  transition: filter 320ms ease-out;
+}
+.brain-assistant__svg,
+.brain-assistant__image {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.brain-assistant__image {
+  border-radius: 50%;
+  object-fit: cover;
+}
+.brain-assistant__halo,
+.brain-assistant__core {
+  transform-origin: 100px 100px;
+  animation: brain-breathing 5.4s ease-in-out infinite;
+}
+.brain-assistant__sparks circle {
+  opacity: 0.6;
+  animation: brain-spark 3.6s ease-in-out infinite;
+}
+.brain-assistant__sparks circle:nth-child(2) {
+  animation-delay: 0.4s;
+}
+.brain-assistant__sparks circle:nth-child(3) {
+  animation-delay: 0.8s;
+}
+.brain-assistant__sparks circle:nth-child(4) {
+  animation-delay: 1.2s;
+}
+.brain-assistant__sparks circle:nth-child(5) {
+  animation-delay: 1.6s;
+}
+.brain-assistant__sparks circle:nth-child(6) {
+  animation-delay: 2.0s;
+}
+.brain-assistant__sparks circle:nth-child(7) {
+  animation-delay: 2.4s;
+}
+
+/*
+ * State modifiers — minimal monochrome treatment for the scholarly-vellum
+ * theme. No blue, no violet, no big glow blooms. The orb shifts character
+ * through animation speed alone; if a tint is needed it draws from --signal
+ * (forest) at low opacity.
+ */
+.brain-assistant--listening .brain-assistant__core {
+  animation-duration: 1.6s;
+}
+
+.brain-assistant--transcribing .brain-assistant__sparks circle {
+  animation-duration: 1.4s;
+  opacity: 0.85;
+}
+
+.brain-assistant--thinking {
+  filter: drop-shadow(0 1px 6px var(--signal-shadow));
+}
+.brain-assistant--thinking .brain-assistant__halo {
+  animation-duration: 2.6s;
+}
+.brain-assistant--thinking .brain-assistant__sparks circle {
+  animation-duration: 1.2s;
+}
+
+.brain-assistant--responding .brain-assistant__core {
+  animation-duration: 0.9s;
+}
+
+.brain-assistant--speaking .brain-assistant__core {
+  animation: brain-breathing 0.6s ease-in-out infinite;
+}
+.brain-assistant--speaking .brain-assistant__sparks circle {
+  animation-duration: 0.55s;
+}
+
+.brain-assistant--disabled {
+  filter: grayscale(1) drop-shadow(0 0 12px rgba(140, 140, 140, 0.2));
+  opacity: 0.55;
+}
+.brain-assistant--disabled .brain-assistant__halo,
+.brain-assistant--disabled .brain-assistant__core,
+.brain-assistant--disabled .brain-assistant__sparks circle {
+  animation: none;
+}
+
+.brain-assistant--error {
+  filter: drop-shadow(0 0 22px rgba(220, 80, 80, 0.55));
+}
+.brain-assistant--error .brain-assistant__halo,
+.brain-assistant--error .brain-assistant__core {
+  animation: none;
+}
+
+@keyframes brain-breathing {
+  0%,
+  100% {
+    transform: scale(0.96);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+}
+@keyframes brain-spark {
+  0%,
+  100% {
+    opacity: 0.35;
+    r: 1.2;
+  }
+  50% {
+    opacity: 1;
+    r: 2.2;
+  }
+}
+
+/* Accessibility: collapse animations when the user prefers reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .brain-assistant__halo,
+  .brain-assistant__core,
+  .brain-assistant__sparks circle {
+    animation: none !important;
+    transition: none !important;
+  }
+  .brain-assistant {
+    transition: none !important;
+  }
+}
+
+/* ------- D-048: VoiceCapture controls ------- */
+.voice-capture {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 6px 0 8px;
+}
+.voice-capture__controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.voice-capture__consent {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0;
+}
+.voice-capture__unsupported {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 6px 0;
+  font-style: italic;
+}
+
+/* ------- D-048: verification-form voice toggle + chip + assistant slot ------- */
+.verification-form__assistant {
+  display: flex;
+  justify-content: center;
+  margin: 0 0 12px;
+}
+.verification-form__answer-toggle {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin: 6px 0;
+}
+.verification-form__toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  color: var(--muted);
+}
+.verification-form__toggle--active {
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+.verification-form__voice-chip {
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  border: var(--border-width-hairline) solid var(--border);
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* ------- Sprint A: evidence-report outcome banner ------- */
+.outcome-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin: 8px 0 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: 14px;
+}
+.outcome-banner__detail {
+  color: var(--muted);
+}
+.outcome-banner--pass {
+  background: rgba(34, 197, 94, 0.06);
+  border-color: rgba(34, 197, 94, 0.3);
+}
+.outcome-banner--needs_review {
+  background: rgba(217, 119, 6, 0.06);
+  border-color: rgba(217, 119, 6, 0.3);
+}
+.outcome-banner--fail {
+  background: rgba(220, 38, 38, 0.06);
+  border-color: rgba(220, 38, 38, 0.3);
+}
+.outcome-banner--empty {
+  color: var(--muted);
+  font-style: italic;
+}
+
+.reference-pin-tag {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fcd34d;
+}
+
+.verification-card__subtitle {
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 8px;
+  font-style: italic;
+}
+
+.ledger-anchors {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.ledger-anchors li {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 12px;
+  font-size: 14px;
+  align-items: baseline;
+}
+.ledger-anchors li > strong {
+  color: var(--text);
+}
+.ledger-anchors li > span {
+  color: var(--muted);
+  font-size: 13px;
+}
+.ledger-anchors code {
+  font-size: 12px;
+  background: #f1f5f9;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+/* --- teacher review dashboard --- */
+
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin: 16px 0 24px;
+}
+.dashboard-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.dashboard-card__value {
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text);
+}
+.dashboard-card__label {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.dashboard-table-wrap {
+  overflow-x: auto;
+}
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.dashboard-table th,
+.dashboard-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+}
+.dashboard-table th {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+}
+.dashboard-table tr:last-child td {
+  border-bottom: none;
+}
+
+.dashboard-pill {
+  display: inline-block;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 600;
+  min-width: 90px;
+  text-align: center;
+}
+.dashboard-pill--neutral {
+  background: #e2e8f0;
+  color: #475569;
+}
+.dashboard-pill--info {
+  background: #dbeafe;
+  color: #1e3a8a;
+}
+
+.page-header__actions {
+  display: flex;
+  gap: 8px;
+}
+
+.back-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+.back-row__link {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+}
+.back-row__link:hover {
+  color: var(--accent);
+}
+
+/* ------- AI-help master toggle (D-047) ------- */
+.ai-help-master {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px 12px;
+  margin: 0 0 12px;
+  background: var(--surface);
+}
+.ai-help-master legend {
+  font-weight: 500;
+  padding: 0 4px;
+}
+.ai-help-master__option {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 6px 4px;
+  cursor: pointer;
+}
+.ai-help-master__option input[type="radio"] {
+  margin-top: 2px;
+}
+.ai-help-master__option strong {
+  display: block;
+}
+.ai-help-master__hint {
+  display: block;
+  color: var(--muted);
+  font-size: 13px;
+}
+.ai-help-inactive {
+  opacity: 0.5;
+  pointer-events: none;
+}
+.policy-banner--disabled {
+  border-color: var(--muted);
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* ------- Collapsible details / progressive disclosure ------- */
+.disclosure {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  margin: 10px 0;
+}
+.disclosure > summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 12px 16px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+.disclosure > summary::after {
+  content: "▸";
+  color: var(--muted);
+  font-size: 14px;
+  transition: transform 0.15s;
+}
+.disclosure[open] > summary::after {
+  transform: rotate(90deg);
+}
+.disclosure > summary:hover {
+  background: rgba(0, 0, 0, 0.03);
+}
+.disclosure__body {
+  padding: 0 16px 14px;
+}
+.disclosure__hint {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 400;
+  margin-left: auto;
+  margin-right: 22px;
+}
+
+/* ------- Task checklist card (instructor [id]) ------- */
+.task-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 12px 0 18px;
+}
+.task-card h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1rem;
+}
+.task-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-top: 1px dashed var(--border);
+  gap: 12px;
+}
+.task-card__row:first-of-type {
+  border-top: 0;
+}
+.task-card__label {
+  font-weight: 500;
+}
+.task-card__state {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 13px;
+}
+.task-card__state--done {
+  color: var(--accent);
+}
+.task-card__state--missing {
+  color: var(--danger, #b35a00);
+}
+.task-card__count {
+  font-weight: 500;
+}
+
+/* ------- Stepper (student [id]) ------- */
+.step-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+}
+.step-header__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+/* ------- Primary-action card on submissions/[id] ------- */
+.primary-action-card {
+  background: var(--accent-soft, rgba(33, 102, 235, 0.06));
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  padding: 14px 18px;
+  margin: 14px 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+.primary-action-card__text strong {
+  display: block;
+  margin-bottom: 2px;
+}
+.primary-action-card__text span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* When details are nested for collapsible disclosure, print should open everything. */
+@media print {
+  details.disclosure,
+  details {
+    /* Force-render every collapsible body for paper output, regardless of open state. */
+  }
+  details.disclosure > summary::after,
+  details > summary::after {
+    display: none;
+  }
+  details.disclosure > *:not(summary),
+  details > *:not(summary) {
+    display: block !important;
+  }
+}
+
+/* ------- Evidence report (printable) ------- */
+.evidence-report-page {
+  max-width: 900px;
+}
+.evidence-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.evidence-section {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 18px;
+  margin: 12px 0;
+}
+.evidence-section--header h1 {
+  margin: 8px 0 4px;
+}
+.evidence-section h2 {
+  margin-top: 0;
+}
+.evidence-section h3 {
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  margin-top: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.evidence-section--disclaimer {
+  border-color: var(--muted);
+  background: rgba(0, 0, 0, 0.02);
+}
+.evidence-card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin: 10px 0;
+  background: var(--surface);
+}
+.evidence-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.evidence-questions {
+  margin: 0;
+  padding-left: 18px;
+}
+.evidence-questions li {
+  margin: 8px 0;
+}
+.evidence-q__prompt {
+  font-weight: 500;
+}
+.evidence-q__answer,
+.evidence-q__feedback {
+  margin-top: 4px;
+}
+.evidence-feedback {
+  margin: 8px 0;
+}
+
+@media print {
+  /* Hide everything chrome-related so the printable page is clean. */
+  .top-nav,
+  .evidence-toolbar,
+  .back-link,
+  .back-row,
+  .back-row__link,
+  button {
+    display: none !important;
+  }
+  body,
+  main,
+  .evidence-report-page {
+    background: #fff !important;
+    color: #000 !important;
+    max-width: none !important;
+  }
+  .evidence-section,
+  .evidence-card {
+    border: 1px solid #999 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+  }
+  code {
+    color: #000 !important;
+  }
+}
+
+/* =====================================================================
+   Acta TA Lab — RECONCILED to the global warm-vellum palette.
+   Scoped [data-theme="ta-lab"] block deleted (G9 deferral retired).
+   The TA Lab now consumes the global tokens like every other surface.
+   Layout classes (.ta-lab__*) survive; their colors moved from
+   neon-on-near-black to ink-on-vellum:
+     accent  → var(--signal)   forest green
+     quiet/2 → var(--quiet)    ink blue
+     bg/dark → var(--bg-base) / var(--bg-elevated) / var(--bg-overlay)
+   Ring opacities reduced for "ink on paper" rather than "neon on black."
+   ===================================================================== */
+
+.ta-lab-shell {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  letter-spacing: var(--track-base);
+  overflow: hidden;
+}
+
+.ta-lab__muted {
+  color: var(--text-muted);
+  padding: var(--space-4);
+}
+
+/* ----- Top bar -----
+ * FI-1 fix: at widths >= 1280px the 4-column grid (brand / assignment /
+ * help-types / controls) fits comfortably. Between 1024 and 1279, the
+ * help-types row needs to break to a new line OR the warn chip wraps
+ * inside the assignment column and overlaps the help-types pills.
+ * Solution: a 3-column grid (brand / assignment / controls) with the
+ * help-types row spanning the full width on row 2 at <1280px. At >=1280px
+ * the grid returns to 4 columns in a single row.
+ */
+.ta-lab__topbar {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto;
+  gap: var(--space-2) var(--space-3);
+  align-items: center;
+  padding: var(--space-2) var(--space-4);
+  border-bottom: var(--border-width-hairline) solid var(--border);
+  background: var(--bg-overlay);
+  backdrop-filter: blur(8px);
+}
+.ta-lab__topbar > .ta-lab__brand {
+  grid-row: 1;
+  grid-column: 1;
+}
+.ta-lab__topbar > .ta-lab__assignment {
+  grid-row: 1;
+  grid-column: 2;
+}
+.ta-lab__topbar > .ta-lab__controls {
+  grid-row: 1;
+  grid-column: 3;
+}
+.ta-lab__topbar > .ta-lab__help-types {
+  grid-row: 2;
+  grid-column: 1 / -1;
+}
+
+/*
+ * Single-row topbar deliberately rejected at all widths >=1024.
+ * The warn chip ("final answers restricted") + 5 help-type pills + the
+ * 4-button control cluster all compete for horizontal space; the only
+ * width at which they fit without truncating the warn chip's policy
+ * language is roughly ~1600+. Below that the warn chip got clipped
+ * by overflow:hidden, which dropped "restricted" — silently destroying
+ * the policy meaning. A 2-row topbar at every width preserves every
+ * label's full text and removes the overlap risk entirely.
+ *
+ * FI-1 reproduction recipe (verified 1024/1280/1440):
+ *   GET /student/{id}/ta-lab?demo=1 at the three widths;
+ *   inspect .ta-lab__topbar height (should be ~82px) and verify
+ *   .ta-lab__assignment chips and .ta-lab__help-types pills sit on
+ *   different rows (different bounding-rect Y).
+ */
+.ta-lab__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.ta-lab__wordmark {
+  font-weight: var(--weight-strong);
+  letter-spacing: var(--track-eyebrow);
+  color: var(--signal);
+}
+.ta-lab__role {
+  font-size: var(--type-xs);
+  color: var(--text-muted);
+  letter-spacing: 0.22em;
+}
+.ta-lab__assignment {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+  /* Stay on one row — overflow ellipsis on the title eats the slack. */
+  flex-wrap: nowrap;
+  overflow: hidden;
+}
+.ta-lab__assignment > .ta-lab__chip {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+.ta-lab__assignment-title {
+  color: var(--text-primary);
+  font-size: var(--type-base);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 28ch;
+}
+.ta-lab__help-types {
+  display: inline-flex;
+  gap: var(--space-1);
+  justify-self: end;
+}
+.ta-lab__controls {
+  display: inline-flex;
+  gap: var(--space-1);
+  align-items: center;
+  justify-self: end;
+}
+
+.ta-lab__pill {
+  font: inherit;
+  font-size: var(--type-sm);
+  letter-spacing: var(--track-sm);
+  padding: var(--space-1) var(--space-3);
+  background: transparent;
+  color: var(--text-primary);
+  border: var(--border-width-hairline) solid var(--border);
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  transition: border-color var(--duration-base) var(--ease-out-snap), background
+    var(--duration-base) var(--ease-out-snap), box-shadow var(--duration-base) var(--ease-out-snap);
+}
+.ta-lab__pill:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  box-shadow: 0 2px 8px var(--signal-shadow);
+}
+.ta-lab__pill--active {
+  background: var(--signal);
+  color: var(--text-inverse);
+  border-color: var(--signal);
+}
+.ta-lab__pill:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ta-lab__chip {
+  font-size: var(--type-xs);
+  letter-spacing: var(--track-xs);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-1);
+  border: var(--border-width-hairline) solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+}
+.ta-lab__chip--meta {
+  color: var(--text-muted);
+}
+.ta-lab__chip--warn {
+  /* Stroke-only per the WARN usage rule — body text stays primary. */
+  border-left: var(--border-width-strong) solid var(--warn);
+  background: var(--warn-bg);
+  color: var(--text-primary);
+}
+.ta-lab__chip--live {
+  color: var(--signal);
+  border-color: var(--border-strong);
+  animation: ta-lab-pulse 2.4s var(--ease-out-snap) infinite;
+}
+.ta-lab__chip--off {
+  color: var(--text-muted);
+}
+.ta-lab__back {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: var(--type-sm);
+  letter-spacing: var(--track-sm);
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-width-hairline) solid var(--border);
+  border-radius: var(--radius-2);
+}
+.ta-lab__back:hover {
+  color: var(--text-primary);
+  border-color: var(--border-strong);
+}
+
+/* ----- Main stage ----- */
+.ta-lab__main {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.ta-lab__stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  width: 100%;
+  height: 100%;
+  padding: 18px;
+}
+.ta-lab__orbit-field {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+/*
+ * Orbital rings — minimal hairline circles. Monochrome neutral, no
+ * colored glow. The rings still rotate to communicate "alive" but read
+ * as faint ink markings rather than auras.
+ */
+.ta-lab__ring {
+  position: absolute;
+  border: var(--border-width-hairline) solid var(--border-muted);
+  border-radius: var(--radius-round);
+  opacity: 0.7;
+  transform-origin: center;
+  animation: ta-lab-orbit 26s var(--ease-linear) infinite;
+}
+.ta-lab__ring--a {
+  width: 380px;
+  height: 380px;
+  transform: rotate(12deg);
+}
+.ta-lab__ring--b {
+  width: 480px;
+  height: 480px;
+  transform: rotate(-32deg);
+  animation-duration: 36s;
+  animation-direction: reverse;
+}
+.ta-lab__ring--c {
+  width: 600px;
+  height: 600px;
+  animation-duration: 60s;
+}
+.ta-lab__orbit-field--thinking .ta-lab__ring {
+  animation-duration: 8s;
+  border-color: var(--border);
+}
+.ta-lab__orbit-field--speaking .ta-lab__ring {
+  animation-duration: 6s;
+  border-color: var(--border);
+}
+.ta-lab__orbit-field--listening .ta-lab__ring {
+  border-color: var(--border);
+}
+.ta-lab__orbit-field--disabled .ta-lab__ring {
+  animation: none;
+  opacity: 0.18;
+}
+.ta-lab__orbit-field--error .ta-lab__ring {
+  border-color: rgba(138, 31, 34, 0.35);
+}
+
+.ta-lab__orb {
+  position: relative;
+  display: grid;
+  place-items: center;
+  /* No drop-shadow halo. The orb is monochrome and silent on vellum. */
+}
+.ta-lab__caption {
+  font-size: var(--type-sm);
+  letter-spacing: var(--track-eyebrow);
+  color: var(--text-muted);
+  margin: 0;
+  text-transform: uppercase;
+}
+
+/* ----- Voice settings overlay ----- */
+.ta-lab__voice-panel {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  width: 320px;
+  background: var(--bg-overlay);
+  border: var(--border-width-hairline) solid var(--border-strong);
+  border-radius: var(--radius-2);
+  padding: var(--space-3);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 18px var(--signal-shadow);
+  z-index: var(--z-overlay);
+}
+.ta-lab__voice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+.ta-lab__voice-title {
+  font-size: var(--type-xs);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--signal);
+}
+.ta-lab__voice-close {
+  background: transparent;
+  border: var(--border-width-hairline) solid var(--border);
+  color: var(--text-primary);
+  border-radius: var(--radius-1);
+  width: 22px;
+  height: 22px;
+  font: inherit;
+  cursor: pointer;
+}
+.ta-lab__voice-row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: var(--space-2) 0;
+}
+.ta-lab__voice-label {
+  font-size: var(--type-xs);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+}
+.ta-lab__voice-readout {
+  color: var(--signal);
+}
+.ta-lab__voice-select {
+  font: inherit;
+  background: var(--bg-elevated);
+  border: var(--border-width-hairline) solid var(--border);
+  color: var(--text-primary);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-1);
+}
+.ta-lab__voice-panel input[type="range"] {
+  accent-color: var(--signal);
+}
+.ta-lab__voice-test {
+  width: 100%;
+  margin-top: var(--space-2);
+  padding: var(--space-3);
+  font: inherit;
+  font-size: var(--type-sm);
+  letter-spacing: var(--track-eyebrow);
+  background: transparent;
+  color: var(--signal);
+  border: var(--border-width-hairline) solid var(--border-strong);
+  border-radius: var(--radius-1);
+  cursor: pointer;
+  transition: all var(--duration-base) var(--ease-out-snap);
+}
+.ta-lab__voice-test:hover:not(:disabled) {
+  background: var(--signal);
+  color: var(--text-inverse);
+  box-shadow: 0 2px 12px var(--signal-shadow);
+}
+/*
+ * CL2 privacy pattern: eyebrow is the LABEL ("PRIVACY"); the
+ * privacy sentence sits in a sibling prose paragraph in muted text.
+ * Both wrappers are pre-existing in the React component; the .ta-lab__voice-note
+ * class now styles only the prose paragraph.
+ */
+.ta-lab__voice-note {
+  margin: var(--space-3) 0 0;
+  font-size: var(--type-sm);
+  color: var(--text-muted);
+}
+.ta-lab__voice-note-eyebrow {
+  display: block;
+  margin: var(--space-3) 0 var(--space-1);
+  font-size: var(--type-xs);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/*
+ * ----- Transcript -----
+ * The "page where the conversation is being written." Reads as a
+ * scholarly artifact on vellum, not as a terminal. The previous dark
+ * inner panel is replaced with --bg-elevated + hairline border, the
+ * same Card pattern used everywhere else.
+ */
+.ta-lab__transcript {
+  border-top: var(--border-width-hairline) solid var(--border);
+  background: var(--bg-elevated);
+  max-height: 32vh;
+  overflow-y: auto;
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--type-sm);
+  line-height: var(--lh-base);
+}
+.ta-lab__transcript-empty {
+  color: var(--text-muted);
+  margin: 0;
+}
+.ta-lab__row {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  border-bottom: var(--border-width-hairline) dashed var(--divider);
+}
+.ta-lab__row:last-child {
+  border-bottom: none;
+}
+.ta-lab__row-prefix {
+  color: var(--signal);
+  font-size: var(--type-xs);
+  letter-spacing: var(--track-sm);
+  align-self: start;
+}
+.ta-lab__row--student .ta-lab__row-prefix {
+  color: var(--quiet);
+}
+.ta-lab__row--refusal .ta-lab__row-prefix {
+  color: var(--warn);
+}
+.ta-lab__row-body {
+  min-width: 0;
+}
+.ta-lab__row-content {
+  white-space: pre-wrap;
+  color: var(--text-primary);
+}
+.ta-lab__row-reason {
+  /* Warn used only as left border-stroke per the warn rule;
+     body sentence stays --text-primary. */
+  margin-top: var(--space-1);
+  padding-left: var(--space-2);
+  border-left: var(--border-width-strong) solid var(--warn);
+  color: var(--text-primary);
+  font-size: var(--type-sm);
+}
+.ta-lab__row-meta {
+  margin-top: var(--space-1);
+  font-size: var(--type-xs);
+  color: var(--text-muted);
+  letter-spacing: var(--track-sm);
+  display: inline-flex;
+  gap: var(--space-3);
+}
+.ta-lab__refusal-tag {
+  color: var(--warn);
+}
+.ta-lab__row--error {
+  color: var(--error);
+  border-color: rgba(138, 31, 34, 0.25);
+}
+
+/* ----- Bottom dock ----- */
+.ta-lab__dock {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: var(--space-2);
+  align-items: end;
+  padding: var(--space-2) var(--space-4);
+  border-top: var(--border-width-hairline) solid var(--border);
+  background: var(--bg-overlay);
+  backdrop-filter: blur(8px);
+}
+.ta-lab__dock-caret {
+  color: var(--signal);
+  font-size: var(--type-md);
+  padding-bottom: var(--space-2);
+}
+.ta-lab__dock-input {
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: var(--type-base);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: var(--border-width-hairline) solid var(--border);
+  border-radius: var(--radius-2);
+  padding: var(--space-2) var(--space-3);
+  resize: vertical;
+  caret-color: var(--signal);
+}
+.ta-lab__dock-input:focus {
+  outline: none;
+  border-color: var(--border-strong);
+  box-shadow: 0 0 0 4px var(--signal-glow);
+}
+.ta-lab__dock-input::placeholder {
+  color: var(--text-muted);
+}
+.ta-lab__dock-actions {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-1);
+  min-width: 160px;
+}
+.ta-lab__dock-send {
+  font: inherit;
+  font-size: var(--type-sm);
+  letter-spacing: var(--track-eyebrow);
+  padding: var(--space-2) var(--space-3);
+  background: var(--signal);
+  color: var(--text-inverse);
+  border: var(--border-width-hairline) solid var(--signal);
+  border-radius: var(--radius-2);
+  cursor: pointer;
+  transition: filter var(--duration-base) var(--ease-out-snap), box-shadow var(--duration-base)
+    var(--ease-out-snap);
+}
+.ta-lab__dock-send:hover:not(:disabled) {
+  filter: brightness(1.05);
+  box-shadow: 0 2px 12px var(--signal-shadow);
+}
+.ta-lab__dock-send:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/*
+ * ----- Voice chat input inside the dock -----
+ * Scoping no longer requires [data-theme="ta-lab"] now that we're on
+ * the unified palette. Buttons inherit the global .btn--ghost rule
+ * from atoms.css; this block only tweaks layout density inside the
+ * narrow dock column.
+ */
+.ta-lab__dock .voice-chat-input {
+  align-items: stretch;
+}
+.ta-lab__dock .voice-chat-input__consent {
+  color: var(--text-muted);
+  font-size: var(--type-xs);
+}
+
+/* ----- Animations ----- */
+@keyframes ta-lab-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ta-lab-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--signal-glow);
+  }
+  50% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+/* Accessibility — reduced motion collapses all TA Lab animations. */
+@media (prefers-reduced-motion: reduce) {
+  .ta-lab__ring,
+  .ta-lab__chip--live {
+    animation: none !important;
+  }
+  .ta-lab__pill,
+  .ta-lab__dock-send,
+  .ta-lab__voice-test {
+    transition: none !important;
+  }
+}
+
+/* ----- Open TA Lab CTA on the student page (reconciled to vellum) ----- */
+.ta-lab-cta {
+  display: inline-flex;
+  align-items: center;
+  margin: var(--space-2) 0 var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-hairline) solid var(--signal);
+  border-radius: var(--radius-2);
+  color: var(--signal);
+  letter-spacing: var(--track-base);
+  text-decoration: none;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  font-weight: var(--weight-heading);
+  transition: background var(--duration-fast) var(--ease-out-snap), box-shadow var(--duration-fast)
+    var(--ease-out-snap);
+}
+.ta-lab-cta:hover {
+  background: var(--bg-elevated);
+  box-shadow: 0 2px 12px var(--signal-shadow);
+}

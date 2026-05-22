@@ -1,0 +1,1004 @@
+/*
+ * Acta atoms.css — base layer (Phase 1 step 2).
+ *
+ * Contains: global reset, body baseline, focus ring, plus the
+ * classname-only atoms shipped in step 2:
+ *   - .eyebrow
+ *   - .card (+ .card--interactive, .card--compact, .card--skeleton)
+ *   - .skeleton-line
+ *   - .banner (+ variants)
+ *   - .stepper (+ vertical/horizontal)
+ *   - .role-instructor, .role-student
+ *
+ * Wrapper atoms (Button, Pill, StatusPill, HashChip, TextArea) ship
+ * in steps 3–7 and append additional rules to this file. Order in the
+ * cascade: tokens → atoms → surfaces. See globals.css for the import shell.
+ */
+
+/* ========== BASE RESET ========== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--type-base);
+  line-height: var(--lh-base);
+  letter-spacing: var(--track-base);
+  font-weight: var(--weight-body);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ========== FOCUS RING (global :focus-visible) ========== */
+/*
+ * Two-layer shadow on cream: a soft inner halo plus a subtle
+ * elevation drop. Both fade automatically in print via the
+ * tokens.css print override that flips both glow tokens to transparent.
+ */
+:focus-visible {
+  outline: var(--border-width-strong) solid var(--signal);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px var(--signal-glow), 0 2px 8px var(--signal-shadow);
+  border-radius: inherit;
+}
+/* No outline on mouse focus — keyboard-only ring per spec. */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ========== EYEBROW ========== */
+/*
+ * Decorative scaffolding above section headers. The "//" prefix is
+ * typed into the markup (kept readable in HTML, not auto-injected).
+ */
+.eyebrow {
+  display: inline-block;
+  font-size: var(--type-xs);
+  line-height: var(--lh-xs);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  font-weight: var(--weight-body);
+  color: var(--signal);
+  margin: 0 0 var(--space-2);
+}
+.eyebrow--muted {
+  color: var(--text-muted);
+}
+.eyebrow--signal {
+  color: var(--signal);
+}
+
+/* ========== CARD ========== */
+/*
+ * The single most-used surface primitive. Hairline 1px border with
+ * 8x8 L-bracket corner ticks drawn INSIDE the border at inset:4px.
+ * Effective interior padding budget: --space-4 (16px) + 4px tick inset.
+ *
+ * Implementation note for corner ticks: a single layered
+ * background-image carrying four L-bracket strokes positioned at the
+ * four corners. The brackets are visible only when the card has a
+ * border (decorative); they hide automatically in print via the
+ * tokens.css print override that flips --tick-color to #000.
+ */
+.card {
+  position: relative;
+  background: var(--bg-elevated);
+  border: var(--border-width-hairline) solid var(--border);
+  border-radius: var(--radius-0);
+  padding: calc(var(--space-4) + var(--tick-inset));
+  margin: 0 0 var(--space-4);
+}
+
+/* Four corner ticks via inset pseudo-elements. */
+.card::before,
+.card::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  width: var(--tick-size);
+  height: var(--tick-size);
+}
+/* Top-left + bottom-right via ::before (two corners) */
+.card::before {
+  top: var(--tick-inset);
+  left: var(--tick-inset);
+  border-top: var(--border-width-hairline) solid var(--tick-color);
+  border-left: var(--border-width-hairline) solid var(--tick-color);
+  /* bottom-right corner — drawn relative to the panel via a large offset */
+  box-shadow: calc(100% + (var(--tick-size) * -1) * 0) 0 0 0 transparent;
+}
+/* Use a second pseudo for the remaining three corners via a single
+ * tick container. Simpler: use four absolutely-positioned spans
+ * rendered by the .card. Since this layer is classname-only, we
+ * stick with the two-pseudo approach and accept that L-bracket
+ * fidelity is "two corners highlighted." If you want all four,
+ * a span-based corner-tick helper class is added below. */
+.card::after {
+  bottom: var(--tick-inset);
+  right: var(--tick-inset);
+  border-bottom: var(--border-width-hairline) solid var(--tick-color);
+  border-right: var(--border-width-hairline) solid var(--tick-color);
+}
+
+/*
+ * Optional: render all four corner ticks by adding two extra
+ * decorative spans. Markup pattern (surfaces opt in when needed):
+ *   <section class="card">
+ *     <span class="card__tick card__tick--tr" aria-hidden="true"></span>
+ *     <span class="card__tick card__tick--bl" aria-hidden="true"></span>
+ *     ... content ...
+ *   </section>
+ *
+ * The default .card already renders top-left + bottom-right ticks
+ * via pseudo-elements. For visual symmetry on hero cards, add the
+ * two manual ticks via .card__tick.
+ */
+.card__tick {
+  position: absolute;
+  width: var(--tick-size);
+  height: var(--tick-size);
+  pointer-events: none;
+}
+.card__tick--tr {
+  top: var(--tick-inset);
+  right: var(--tick-inset);
+  border-top: var(--border-width-hairline) solid var(--tick-color);
+  border-right: var(--border-width-hairline) solid var(--tick-color);
+}
+.card__tick--bl {
+  bottom: var(--tick-inset);
+  left: var(--tick-inset);
+  border-bottom: var(--border-width-hairline) solid var(--tick-color);
+  border-left: var(--border-width-hairline) solid var(--tick-color);
+}
+
+.card--interactive {
+  cursor: pointer;
+  transition: border-color var(--duration-fast) var(--ease-out-snap), box-shadow
+    var(--duration-fast) var(--ease-out-snap);
+}
+.card--interactive:hover {
+  border-color: var(--border-strong);
+  /* Soft elevation lift on cream — reads as "this card is liftable" without the neon halo of a developer-tool theme. */
+  box-shadow: 0 2px 12px var(--signal-shadow);
+}
+.card--interactive:focus-within {
+  border-color: var(--border-strong);
+}
+
+.card--compact {
+  padding: calc(var(--space-3) + var(--tick-inset));
+  margin-bottom: var(--space-3);
+}
+
+.card__header {
+  margin-bottom: var(--space-3);
+}
+.card__body {
+  /* default — relies on container padding */
+}
+.card__footer {
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: var(--border-width-hairline) dashed var(--divider);
+}
+
+/* ========== SKELETON (sub-atom of Card per TSS1) ========== */
+.card--skeleton {
+  background: var(--bg-base);
+  border-color: var(--border-muted);
+}
+.card--skeleton::before,
+.card--skeleton::after {
+  border-color: var(--border-muted);
+}
+.skeleton-line {
+  display: block;
+  height: var(--type-md);
+  background: var(--bg-elevated);
+  margin: var(--space-2) 0;
+  position: relative;
+  overflow: hidden;
+}
+.skeleton-line--wide {
+  width: 80%;
+}
+.skeleton-line--narrow {
+  width: 45%;
+}
+.skeleton-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, var(--divider) 50%, transparent 100%);
+  transform: translateX(-100%);
+  animation: acta-skeleton-shimmer 1.2s var(--ease-linear) infinite;
+}
+
+@keyframes acta-skeleton-shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* ========== BANNER ========== */
+/*
+ * Variant via modifier class. ARIA: role only — alert on --error,
+ * status on every other variant. NO explicit aria-live anywhere
+ * (Deliverable 3 D2 — role implies live region).
+ */
+.banner {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-hairline) solid var(--border);
+  border-left-width: var(--border-width-strong);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  margin: 0 0 var(--space-4);
+  animation: acta-banner-mount var(--duration-base) var(--ease-out-snap);
+}
+.banner__title {
+  font-size: var(--type-sm);
+  font-weight: var(--weight-heading);
+  letter-spacing: var(--track-sm);
+}
+.banner__body {
+  font-size: var(--type-base);
+  color: var(--text-primary);
+}
+.banner__detail {
+  font-size: var(--type-sm);
+  color: var(--text-muted);
+}
+
+.banner--policy {
+  border-left-color: var(--border-strong);
+}
+/*
+ * WARN body-text rule (locked in tokens.css commentary):
+ *   --warn is for stroke / border-left / icon tint / chip border ONLY.
+ *   Banner body text is always --text-primary; the warn signal is
+ *   carried by the 2px left stripe (and an icon glyph the surface
+ *   may add as a sibling). --warn-bg is a very light tint, safe
+ *   behind --text-primary.
+ */
+.banner--drift {
+  border-color: var(--warn);
+  border-left-color: var(--warn);
+  background: var(--warn-bg);
+  color: var(--text-primary);
+}
+.banner--refusal {
+  border-color: var(--warn);
+  border-left-color: var(--warn);
+  background: var(--warn-bg);
+  color: var(--text-primary);
+}
+.banner--disabled {
+  border-color: var(--border-muted);
+  border-left-color: var(--border-muted);
+  color: var(--text-muted);
+}
+.banner--error {
+  border-color: var(--error);
+  border-left-color: var(--error);
+  background: var(--error-bg);
+  color: var(--error);
+}
+.banner--success {
+  border-color: var(--signal);
+  border-left-color: var(--signal);
+  background: transparent;
+  color: var(--signal);
+}
+
+@keyframes acta-banner-mount {
+  from {
+    opacity: 0;
+    transform: translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== STEPPER ========== */
+/*
+ * Classname-only per TSS4. Surfaces own iteration. Markup:
+ *   <ol class="stepper stepper--vertical" aria-label="Assignment steps">
+ *     <li class="stepper__step stepper__step--current" aria-current="step">
+ *       <span class="stepper__num">[01]</span>
+ *       <span class="stepper__label">Read the task</span>
+ *       <div class="stepper__body">…</div>
+ *     </li>
+ *     ...
+ *   </ol>
+ */
+.stepper {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: var(--space-5);
+}
+.stepper--vertical {
+  flex-direction: column;
+}
+.stepper--horizontal {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.stepper__step {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-3);
+  align-items: start;
+}
+.stepper--horizontal .stepper__step {
+  grid-template-columns: 1fr;
+  flex: 1 1 180px;
+  gap: var(--space-2);
+}
+
+.stepper__num {
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  letter-spacing: var(--track-sm);
+  color: var(--text-muted);
+  font-weight: var(--weight-heading);
+  white-space: nowrap;
+  padding-top: 2px;
+}
+.stepper__step--current .stepper__num {
+  color: var(--signal);
+}
+.stepper__step--complete .stepper__num {
+  color: var(--text-muted);
+}
+
+.stepper__label {
+  font-size: var(--type-md);
+  letter-spacing: var(--track-md);
+  color: var(--text-primary);
+  display: block;
+  margin-bottom: var(--space-2);
+}
+
+.stepper__body {
+  grid-column: 1 / -1;
+}
+.stepper--vertical .stepper__body {
+  grid-column: 2 / 3;
+}
+
+.stepper__connector {
+  display: block;
+  background: var(--divider);
+  align-self: stretch;
+}
+.stepper--vertical .stepper__connector {
+  width: var(--border-width-hairline);
+  margin-left: calc(var(--space-3) - 1px);
+  min-height: var(--space-4);
+}
+.stepper--horizontal .stepper__connector {
+  height: var(--border-width-hairline);
+  align-self: center;
+  flex: 0 0 var(--space-4);
+}
+
+/* Mobile collapse for vertical stepper (per Deliverable 3 §5.2). */
+@media (max-width: 767px) {
+  .stepper--vertical .stepper__step {
+    grid-template-columns: 1fr;
+  }
+  .stepper--vertical .stepper__body {
+    grid-column: 1 / -1;
+  }
+  .stepper--vertical .stepper__connector {
+    display: none;
+  }
+  /* Inline the number into the label band. */
+  .stepper--vertical .stepper__num {
+    display: inline;
+    margin-right: var(--space-2);
+  }
+}
+
+/* ========== ROLE STRIPES ========== */
+/*
+ * Modifier classes applied to .card/.panel. 2px left border in role color.
+ * Decorative — the role identity is also carried by a sibling .eyebrow,
+ * so screen readers don't need to parse the stripe.
+ */
+.role-instructor {
+  border-left-width: var(--border-width-strong);
+  border-left-color: var(--role-instructor);
+}
+.role-student {
+  border-left-width: var(--border-width-strong);
+  border-left-color: var(--role-student);
+}
+
+/* ========== BUTTON (step 3) ========== */
+/*
+ * Three variants (primary / ghost / danger), two sizes (md / lg).
+ * Bracket framing in the label is decorative and provided by the
+ * surface, not auto-injected. Interactive floor = --type-sm (12px).
+ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  letter-spacing: var(--track-sm);
+  font-weight: var(--weight-heading);
+  line-height: 1;
+  padding: var(--space-3) var(--space-4);
+  border: var(--border-width-hairline) solid var(--border);
+  border-radius: var(--radius-2);
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-decoration: none;
+  user-select: none;
+  min-height: 32px; /* tap target floor per A11y Floor */
+  transition: border-color var(--duration-fast) var(--ease-out-snap), background
+    var(--duration-fast) var(--ease-out-snap), box-shadow var(--duration-fast) var(--ease-out-snap),
+    color var(--duration-fast) var(--ease-out-snap);
+}
+.btn:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  box-shadow: 0 2px 8px var(--signal-shadow);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+.btn:disabled,
+.btn[aria-disabled="true"] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Primary — signal fill, inverse label */
+.btn--primary {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: var(--text-inverse);
+}
+.btn--primary:hover:not(:disabled) {
+  background: var(--signal-dim);
+  border-color: var(--signal-dim);
+  box-shadow: 0 2px 12px var(--signal-shadow);
+}
+
+/* Ghost — transparent fill, hairline border, primary text */
+.btn--ghost {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-primary);
+}
+.btn--ghost:hover:not(:disabled) {
+  border-color: var(--border-strong);
+  background: var(--bg-elevated);
+}
+
+/* Danger — error fill, inverse label */
+.btn--danger {
+  background: var(--error);
+  border-color: var(--error);
+  color: var(--text-inverse);
+}
+.btn--danger:hover:not(:disabled) {
+  filter: brightness(1.05);
+  box-shadow: 0 2px 12px rgba(138, 31, 34, 0.18);
+}
+
+/* Large — hero pairs */
+.btn--lg {
+  font-size: var(--type-md);
+  padding: var(--space-3) var(--space-5);
+  min-height: 40px;
+}
+
+/* ========== PILL (step 4) ========== */
+/*
+ * Polymorphic chip — span (default static), button (toggle), or link.
+ * Sits at --type-sm (interactive floor); --type-xs is forbidden here.
+ */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  letter-spacing: var(--track-sm);
+  font-weight: var(--weight-body);
+  line-height: 1;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-hairline) solid var(--border);
+  border-radius: var(--radius-1);
+  background: transparent;
+  color: var(--text-primary);
+  text-decoration: none;
+  white-space: nowrap;
+  user-select: none;
+  transition: border-color var(--duration-fast) var(--ease-out-snap), background
+    var(--duration-fast) var(--ease-out-snap), color var(--duration-fast) var(--ease-out-snap);
+}
+/* Button + link variants need cursor / hover */
+button.pill,
+a.pill {
+  cursor: pointer;
+}
+button.pill:hover:not(:disabled),
+a.pill:hover {
+  border-color: var(--border-strong);
+}
+button.pill:disabled,
+.pill--disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.pill--active {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: var(--text-inverse);
+}
+
+/* ========== STATUS PILL (step 5) ========== */
+/*
+ * Status-bearing chip. Three enum families:
+ *   verification:  pass | needs-review | fail
+ *   help:          answered | refused | redirected
+ *   perQuestion:   sufficient | partial | insufficient
+ * Wrapper supplies the right variant class; ARIA carries the semantic.
+ * NB: --warn is used only as a stroke (border, no body fill) per the
+ * warn structural rule. Body text always --text-primary.
+ */
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  letter-spacing: var(--track-sm);
+  font-weight: var(--weight-heading);
+  line-height: 1;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-hairline) solid var(--border);
+  border-left-width: var(--border-width-strong);
+  border-radius: var(--radius-1);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+/* Pass / Sufficient / Answered — signal */
+.status-pill--pass,
+.status-pill--sufficient,
+.status-pill--answered {
+  border-left-color: var(--signal);
+}
+/* Needs review / Partial / Refused / Redirected — warn (stroke only) */
+.status-pill--needs-review,
+.status-pill--partial,
+.status-pill--refused,
+.status-pill--redirected {
+  border-color: var(--warn);
+  border-left-color: var(--warn);
+  background: var(--warn-bg);
+}
+/* Fail / Insufficient — error */
+.status-pill--fail,
+.status-pill--insufficient {
+  border-color: var(--error);
+  border-left-color: var(--error);
+  background: var(--error-bg);
+  color: var(--error);
+}
+
+/* ========== HASH CHIP (step 6) ========== */
+/*
+ * Hash display with mount-flash. Truncated label visible; full hash
+ * surfaced via title for hover + screen readers on focus.
+ */
+.hash-chip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  letter-spacing: var(--track-sm);
+  padding: 2px var(--space-2);
+  border: var(--border-width-hairline) solid var(--border);
+  border-radius: var(--radius-1);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  white-space: nowrap;
+  transition: background var(--duration-slow) var(--ease-linear), color var(--duration-slow)
+    var(--ease-linear), border-color var(--duration-slow) var(--ease-linear);
+}
+.hash-chip__label {
+  color: var(--text-muted);
+  font-size: var(--type-xs);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+}
+.hash-chip__value {
+  color: var(--signal);
+}
+
+/* Mount-flash: applied on render, removed after 420ms; the transition
+   defined above fades the chip back to baseline over --duration-slow. */
+.hash-chip.hash-chip--flash {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: var(--text-inverse);
+}
+.hash-chip.hash-chip--flash .hash-chip__value,
+.hash-chip.hash-chip--flash .hash-chip__label {
+  color: var(--text-inverse);
+}
+
+/* ========== FIELD (step 7) — TextArea variant ========== */
+/*
+ * Label → control → hint/error stack. ARIA wired through the React
+ * wrapper (htmlFor / id / aria-describedby / aria-errormessage / aria-invalid).
+ * Cursor-blink pseudo-caret scoped via :placeholder-shown per D3.
+ */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin: 0 0 var(--space-4);
+}
+.field__label {
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--signal);
+  margin-bottom: var(--space-1);
+}
+.field--required .field__label::after {
+  content: " *";
+  color: var(--error);
+}
+.field__wrap {
+  position: relative;
+}
+.field__control {
+  font-family: var(--font-mono);
+  font-size: var(--type-base);
+  letter-spacing: var(--track-base);
+  line-height: var(--lh-base);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: var(--border-width-hairline) solid var(--border);
+  border-radius: var(--radius-2);
+  padding: var(--space-3);
+  width: 100%;
+  caret-color: var(--signal);
+  transition: border-color var(--duration-fast) var(--ease-out-snap);
+}
+.field__control:focus {
+  outline: none;
+  border-color: var(--border-strong);
+}
+.field__control::placeholder {
+  color: var(--text-muted);
+}
+.field__control:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.field--invalid .field__control {
+  border-color: var(--error);
+}
+.field--textarea .field__control {
+  resize: vertical;
+  min-height: 84px;
+}
+.field__hint {
+  font-size: var(--type-sm);
+  color: var(--text-muted);
+  margin: 0;
+}
+.field__error {
+  font-size: var(--type-sm);
+  color: var(--error);
+  margin: 0;
+}
+
+/*
+ * Cursor-blink pseudo-caret (D3): a 2px solid bar inside the field wrap,
+ * positioned at the text start. Visible only when the control matches
+ * :placeholder-shown (empty). Once the user types, the native caret
+ * takes over and the pseudo hides.
+ */
+.field__wrap::before {
+  content: "";
+  position: absolute;
+  top: calc(var(--space-3) + 2px);
+  left: calc(var(--space-3) + 1px);
+  width: 2px;
+  height: 1em;
+  background: var(--signal);
+  opacity: 0;
+  pointer-events: none;
+  animation: acta-cursor-blink 1s var(--ease-linear) infinite;
+}
+.field__wrap:has(.field__control:placeholder-shown:focus)::before {
+  opacity: 1;
+}
+
+@keyframes acta-cursor-blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* ========== CHECKBOX (Phase 1.5 step 2) ========== */
+/*
+ * Custom-rendered checkbox: visually-hidden native input (sr-only pattern)
+ * + a sibling .checkbox__box that picks up :checked / :focus-visible state
+ * via adjacent-sibling selectors. The whole row is wrapped in a <label>
+ * for click-anywhere activation; the implicit label-nesting association
+ * carries the form linkage so no htmlFor is required.
+ *
+ * Variants:
+ *   .checkbox--required     adds an asterisk after the label
+ *   .checkbox--invalid      bordeaux border on the box + error message
+ *   .checkbox--disabled     mutes the whole row at 0.55 opacity
+ *   .checkbox--hard-rule    heavier (2px) box border + inline pill
+ *
+ * hardRule semantics (LOCKED at Track B Step 2 sign-off): visual
+ * differentiation ONLY. No confirmation tooltip, no sticky focus, no
+ * interaction guards. The gate is at form-publish time, not at toggle
+ * time.
+ */
+.checkbox {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  position: relative;
+  cursor: pointer;
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-mono);
+}
+.checkbox--disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+/* sr-only pattern — visually hidden, still focusable + keyboard-accessible. */
+.checkbox__input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.checkbox__box {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  border: var(--border-width-hairline) solid var(--border-strong);
+  border-radius: var(--radius-1);
+  background: var(--bg-elevated);
+  position: relative;
+  transition:
+    background-color var(--duration-fast) var(--ease-out-snap),
+    border-color var(--duration-fast) var(--ease-out-snap);
+}
+.checkbox--hard-rule .checkbox__box {
+  /* Heavier border signals "this is policy authoring chrome"
+   * without changing interaction semantics. */
+  border-width: var(--border-width-strong);
+}
+.checkbox__input:focus-visible + .checkbox__box {
+  outline: 2px solid var(--signal-glow);
+  outline-offset: 2px;
+}
+.checkbox__input:checked + .checkbox__box {
+  background: var(--signal);
+  border-color: var(--signal);
+}
+.checkbox__input:checked + .checkbox__box::after {
+  /* CSS-drawn checkmark — right+bottom borders, rotated 45deg.
+   * Color is --text-inverse cream for AAA contrast against forest green. */
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 5px;
+  width: 5px;
+  height: 10px;
+  border: solid var(--text-inverse);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+.checkbox--invalid .checkbox__box {
+  border-color: var(--error);
+}
+.checkbox__content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.checkbox__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--type-md);
+  letter-spacing: var(--track-md);
+  line-height: var(--lh-md);
+  color: var(--text-primary);
+  font-weight: var(--weight-body);
+}
+.checkbox--required .checkbox__label::after {
+  content: " *";
+  color: var(--error);
+}
+.checkbox__hard-rule-pill {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: var(--type-xs);
+  letter-spacing: var(--track-eyebrow);
+  text-transform: uppercase;
+  color: var(--signal);
+  border: var(--border-width-hairline) solid var(--signal);
+  padding: 1px var(--space-2);
+  border-radius: var(--radius-round);
+  white-space: nowrap;
+  line-height: 1.4;
+}
+.checkbox__helper {
+  font-size: var(--type-sm);
+  color: var(--text-muted);
+  line-height: var(--lh-sm);
+}
+.checkbox__error {
+  font-size: var(--type-sm);
+  color: var(--error);
+  margin: 0;
+}
+
+/* ========== TOP NAV (step 8 — G11 redesign) ========== */
+/*
+ * Mono chrome:  [ ACTA ] // HOME · INSTRUCTOR · STUDENT      ● SESSION
+ * Brand left, links centered via dot separators, session pill right.
+ * Replaces the old SaaS-style two-row nav. /ledger moved to footer.
+ */
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-5);
+  border-bottom: var(--border-width-hairline) solid var(--border);
+  background: var(--bg-elevated);
+  max-width: 100%;
+  margin: 0;
+  font-family: var(--font-mono);
+}
+.top-nav__brand {
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-1);
+  text-decoration: none;
+  color: var(--text-primary);
+  font-size: var(--type-md);
+  letter-spacing: var(--track-md);
+  font-weight: var(--weight-strong);
+}
+.top-nav__wordmark {
+  color: var(--signal);
+  letter-spacing: 0.16em;
+}
+.top-nav__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-4);
+  flex: 1;
+}
+.top-nav__item {
+  display: inline-flex;
+  align-items: baseline;
+}
+.top-nav__link {
+  font-family: var(--font-mono);
+  font-size: var(--type-sm);
+  letter-spacing: var(--track-base);
+  color: var(--text-muted);
+  text-decoration: none;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width-hairline) solid transparent;
+  border-radius: var(--radius-1);
+  transition: color var(--duration-fast) var(--ease-out-snap), border-color var(--duration-fast)
+    var(--ease-out-snap);
+}
+.top-nav__link:hover {
+  color: var(--text-primary);
+}
+.top-nav__link--active {
+  color: var(--signal);
+  border-color: var(--border);
+}
+
+/* SESSION pill — pulses softly to signal the app is live, decoration only. */
+.top-nav__session {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--type-xs);
+  letter-spacing: var(--track-eyebrow);
+  color: var(--text-muted);
+  padding: var(--space-1) var(--space-3);
+  border: var(--border-width-hairline) solid var(--border);
+  border-radius: var(--radius-1);
+}
+.top-nav__session-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-round);
+  background: var(--signal);
+  display: inline-block;
+  animation: acta-session-pulse 2.4s var(--ease-out-snap) infinite;
+}
+
+@keyframes acta-session-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 var(--signal-glow);
+  }
+  50% {
+    box-shadow: 0 0 0 4px transparent;
+  }
+}
+
+@media (max-width: 767px) {
+  .top-nav {
+    padding: var(--space-2) var(--space-3);
+    gap: var(--space-2);
+  }
+  .top-nav__link {
+    font-size: var(--type-xs);
+    padding: var(--space-1);
+  }
+  .top-nav__session {
+    font-size: var(--type-xs);
+    padding: 2px var(--space-2);
+  }
+}
