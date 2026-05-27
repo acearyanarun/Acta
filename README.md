@@ -2,7 +2,7 @@
 
 Acta is the proof layer for AI-era learning. After every submission, the system runs short
 concept checks generated from the student's own work — async by default, live oral for
-high-stakes assessments — and captures every interaction in a cryptographically signed ledger
+high-stakes assessments and captures every interaction in a cryptographically signed ledger
 that defends grades on appeal and supports accreditation review.
 
 **The wedge is verification. Not tutoring.**
