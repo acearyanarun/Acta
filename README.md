@@ -181,4 +181,4 @@ The `.claude/` directory is a custom multi-agent system that drives this build â
 
 ---
 
-Built by [Aryan Arun](https://github.com/aryanarun).
+
